@@ -29,15 +29,19 @@ let fakeServerData = {
   }
 }
 
+let defaultStyle = {
+  color: '#fff',
+  'font-family': 'monospace'
+}
+
 const divStyle = {
   display: 'inline-block',
   padding: '20px',
 }
 
-const headerStyle = {
-  display: 'block',
+let playlistWrap = {
+  display: 'block'
 }
-
 
 
 class SickoMode extends React.Component {
@@ -58,17 +62,38 @@ class SickoMode extends React.Component {
 }
 
 
+class Filter extends React.Component {
+  render() {
+    return (
+      <div style={divStyle}>
+        <img />
+        <input type="text" onKeyUp={event =>
+          this.props.onTextChange(event.target.value)}
+          style={{
+            ...defaultStyle,
+            color: 'black',
+            'font-size': '20px'
+          }} />
+      </div>
+    );
+  }
+}
+
+
 
 class App extends React.Component {
   constructor() {
     super()
-    this.state = { serverData: {} }
+    this.state = {
+      serverData: {},
+      filterString: ''
+    }
   }
 
   componentDidMount() {
     setTimeout(() => {
       this.setState({ serverData: fakeServerData });
-    }, 1000);
+    }, 1000)
   }
 
   render() {
@@ -79,10 +104,16 @@ class App extends React.Component {
         {this.state.serverData.user ?
           <div>
             <h1>{this.state.serverData.user.name}'s Music</h1>
-            <header style={headerStyle} className="App-header">
-              {this.state.serverData.user.playlists.map(playlist =>
-                <SickoMode playlist={playlist} />
-              )}
+
+            <header className="App-header">
+              <Filter onTextChange={text => this.setState({ filterString: text })} />
+              <div style={playlistWrap} className="playlistWrap">
+                {this.state.serverData.user.playlists.filter(playlist =>
+                  playlist.name.toLowerCase().includes(this.state.filterString.toLowerCase())
+                ).map(playlist =>
+                  <SickoMode playlist={playlist} />
+                )}
+              </div>
             </header>
           </div> : <h1>Loading...</h1>
 
